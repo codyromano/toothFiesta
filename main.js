@@ -13,10 +13,10 @@
 	'use strict';
 
 	var UI = {},
-	RadioPlayer, 
-	stopwatch, 
-	DOMHelpers, 
-	UIElements; 
+	var RadioPlayer; 
+	var stopwatch;
+	var DOMHelpers; 
+	var UIElements; 
 
 	DOMHelpers = {
 		getEl: function (elementID) {
