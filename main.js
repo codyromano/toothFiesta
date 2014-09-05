@@ -12,7 +12,7 @@
 (function () {
 	'use strict';
 
-	var UI = {},
+	var UI = {};
 	var RadioPlayer; 
 	var stopwatch;
 	var DOMHelpers; 
