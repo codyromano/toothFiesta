@@ -142,7 +142,7 @@
         var isLoading = false; 
 
 		streams = {
-            'Broken' : 'http://dkdkdkdkdkdkdkdkdkd.org/asdfasdf.mp3',
+            'BobMarley' : 'http://streaming.radionomy.com/Bob-Marley',
 			'NPR' : 'http://public.npr.org/anon.npr-mp3/npr/news/newscast.mp3',
 			'HipHop' : 'http://174.37.110.72:8010/;?icy=http',
 			'Top40' : 'http://listen.radionomy.com/101HitsRadio?icy=http',
