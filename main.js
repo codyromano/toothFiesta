@@ -31,14 +31,18 @@
     // Instance of the StopWatch "class," which handles all 
     // time-related functionality  
 	var stopwatch;
+
+    var radioToggle;
  
-    // Call a function if it exists. This is most useful for
-    // handling user callbacks that are optional. 
+    // A shortcut for handling optional callbacks; 
+    // only call a function if it exists
     LogicHelpers.callMeMaybe = function (fn, fnArgs) {
-        if (typeof fn != 'function') { return false; }
+        if (typeof fn != 'function') { 
+            return false; 
+        }
         fn.apply(null, fnArgs); 
         return true; 
-    }
+    };
 
 	DOMHelpers = {
 		getEl: function (elementID) {
@@ -58,7 +62,7 @@
 		'mainSource',
 		'audioSelection', 
 		'start',
-		'stopAudio',
+		'toggleAudio',
 		'stopBrushing',
 		'pageIntro',
 		'pageBrushing',
@@ -75,6 +79,57 @@
 	});
 
 	UI.start.innerText = smallScreen ? 'Start' : 'Start Brushing';
+
+    /** 
+    * This can be used for any UI element that has 
+    * an on and off state. Customize with on/off callbacks
+    */ 
+    function UIToggle (settings) {
+        var _self = this; 
+
+        // Optional callbacks for on state and off state
+        var callbackForOn = settings.callbackForOn || null; 
+        var callbackForOff = settings.callbackForOff || null; 
+
+        // Associated DOM element 
+        this.el = settings.el || document.createElement('a'); 
+
+        // If the toggle is turned on or off 
+        this.on = settings.initialState || false; 
+
+        // CSS classes for state change 
+        this.classForOn = settings.classForOn || 'toggleOn'; 
+        this.classForOff = settings.classForOff || 'toggleOff';
+
+        this.switchOn = function () {
+            _self.el.classList.add(_self.classForOn); 
+            _self.el.classList.remove(_self.classForOff); 
+
+            LogicHelpers.callMeMaybe(callbackForOn, [_self.el]);
+        };
+
+        this.switchOff = function () {
+            _self.el.classList.add(_self.classForOff);
+            _self.el.classList.remove(_self.classForOn); 
+
+            LogicHelpers.callMeMaybe(callbackForOff, [_self.el]); 
+        };
+
+        this.handleState = function () {
+            _self.on === true ? _self.switchOn() : _self.switchOff(); 
+        };
+
+        // Init
+        (function () {
+            _self.handleState(); 
+
+            _self.el.addEventListener('click', function () {
+                // Toggle on or off state 
+                _self.on = !!!_self.on; 
+                _self.handleState(); 
+            }, false); 
+        })();
+    }
 
 	RadioPlayer = (function () {
 		var _self = this;
@@ -100,7 +155,9 @@
 			stop: stop, 
 			setSource: setSource,
             setStreamTimeout: setStreamTimeout,
-            streamLoading: streamLoading
+            streamLoading: streamLoading,
+            resume: resume,
+            pause: pause
 		};
 
         function setStreamTimeout (newTimeout) {
@@ -152,11 +209,21 @@
 			return API; 
 		};
 
+        function resume () {
+            UI.mainAudio.play(); 
+            return API; 
+        }
+
 		function stop () {
 			UI.mainAudio.pause(); 
 			UI.mainAudio.currentTime = 0; 
 			return API;  
-		};
+		}
+
+        function pause () {
+            UI.mainAudio.pause(); 
+            return API; 
+        }
 
 		function setSource (keyword) {
 			UI.mainSource.src = streams[keyword]; 
@@ -178,7 +245,7 @@
 		this.start = function () {
 			if (counting === false) {
 				counting = true; 
-				setTimeout(function timeOutFn () {
+				window.setTimeout(function timeOutFn () {
 					if (!maxSeconds || seconds < maxSeconds) {
 						++seconds; 
 					}
@@ -250,9 +317,29 @@
 		}
 	});
 
+    // Button for toggling radio on or off 
+    radioToggle = new UIToggle({
+        el: UI.toggleAudio,
+        initialState: true,
+
+        classForOff: 'audioPaused', 
+        classForOn: 'audioPlaying', 
+
+        callbackForOff: function (el) {
+            RadioPlayer.pause(); 
+            el.innerText = 'Play Radio'; 
+        }, 
+        callbackForOn: function (el) {
+            RadioPlayer.resume(); 
+            el.innerText = 'Mute Radio'; 
+        }
+    });
+
 	UI.start.addEventListener('click', function () {
         var startBrushing; 
         var streamTimedOut; 
+
+        radioToggle.switchOn(); 
 
 		UI.start.innerText = 'Loading...';
 		UI.start.classList.add('disabled'); 
@@ -295,10 +382,6 @@
         UI.start.innerText = smallScreen ? 'Start' : 'Start Brushing';
         DOMHelpers.show(UI.pageIntro); 
     }, false);
-
-	UI.stopAudio.addEventListener('click', function () { 
-		RadioPlayer.stop(); 
-	}, false);
 
 	UI.stopBrushing.addEventListener('click', function () {
 		RadioPlayer.stop();  
