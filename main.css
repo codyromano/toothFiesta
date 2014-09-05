@@ -159,6 +159,10 @@ select {
 	background: #fff;
 }
 
+#selectWrapper * {
+	cursor: pointer;
+}
+
 footer, footer a {
 	color: #ece;
 }
