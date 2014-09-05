@@ -51,9 +51,9 @@
 	});
 
 	RadioPlayer = (function () {
-		var _self = this,
-		streams, 
-		API; 
+		var _self = this;
+		var streams; 
+		var API; 
 
 		streams = {
 			'NPR' : 'http://public.npr.org/anon.npr-mp3/npr/news/newscast.mp3',
