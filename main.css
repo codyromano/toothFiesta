@@ -28,6 +28,10 @@ h1 {
 	display: block;
 }
 
+#timeout {
+	text-align: center;
+}
+
 h1, h2 {
 	font-weight: 700; 
 }

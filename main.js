@@ -12,12 +12,33 @@
 (function () {
 	'use strict';
 
+    // Contains a reference to every UI element in the DOM. 
 	var UI = {};
+    var UIElements; 
+
+    // Utility methods for DOM manipulation 
+    var DOMHelpers; 
+
+    // Utility methods for flow control and general logic
+    var LogicHelpers = {};
+
+    // Controls everything related to audio
+    var RadioPlayer;
+
+    // Used for making minor design changes
 	var smallScreen = window.screen.availWidth < 700; 
-	var RadioPlayer; 
+ 
+    // Instance of the StopWatch "class," which handles all 
+    // time-related functionality  
 	var stopwatch;
-	var DOMHelpers; 
-	var UIElements; 
+ 
+    // Call a function if it exists. This is most useful for
+    // handling user callbacks that are optional. 
+    LogicHelpers.callMeMaybe = function (fn, fnArgs) {
+        if (typeof fn != 'function') { return false; }
+        fn.apply(null, fnArgs); 
+        return true; 
+    }
 
 	DOMHelpers = {
 		getEl: function (elementID) {
@@ -44,7 +65,9 @@
 		'progress',
 		'progressBar',
 		'mouthQuadrant',
-		'mouth'
+		'mouth',
+        'timeout',
+        'restart'
 	];
 
 	UIElements.forEach(function (UIEl) {
@@ -58,7 +81,13 @@
 		var streams; 
 		var API; 
 
+		// When we should give up on starting a stream
+		var timeout = 5000;
+
+        var isLoading = false; 
+
 		streams = {
+            'Broken' : 'http://dkdkdkdkdkdkdkdkdkd.org/asdfasdf.mp3',
 			'NPR' : 'http://public.npr.org/anon.npr-mp3/npr/news/newscast.mp3',
 			'HipHop' : 'http://174.37.110.72:8010/;?icy=http',
 			'Top40' : 'http://listen.radionomy.com/101HitsRadio?icy=http',
@@ -69,25 +98,55 @@
 		API = {
 			start: start, 
 			stop: stop, 
-			setSource: setSource
+			setSource: setSource,
+            setStreamTimeout: setStreamTimeout,
+            streamLoading: streamLoading
 		};
 
-		function start (doWhenLoaded) {
-			if (UI.mainSource.src.length > 0) {
-				UI.mainAudio.addEventListener('loadedmetadata', function () {
-					if (typeof doWhenLoaded == 'function') {
+        function setStreamTimeout (newTimeout) {
+            if (typeof newTimeout == 'number' && newTimeout > 0) {
+                timeout = newTimeout; 
+            }
+            return API; 
+        }
 
-						// Add a small timeout here because it looks like a 
-						// mistake if the view changes instantly 
-						setTimeout(function () {
-							doWhenLoaded(); 
-							UI.mainAudio.play(); 
-						}, 1000);  
-					}
-				}, false);
+        function streamLoading () {
+            return isLoading; 
+        }
 
-				UI.mainAudio.load(); 
+		function start (doWhenLoaded, doOnTimeout) {
+            var streamTimedOut = false; 
+            isLoading = true; 
+
+			// No source means nothing to play 
+			if (UI.mainSource.src.length === 0) {
+				return; 
 			}
+
+            // Trigger an error if loading takes too long
+            var triggerError = window.setTimeout(function () {
+                isLoading = false; 
+                streamTimedOut = true; 
+                LogicHelpers.callMeMaybe(doOnTimeout);
+            }, timeout); 
+
+			UI.mainAudio.addEventListener('loadedmetadata', function () {
+                clearTimeout(triggerError); 
+
+                // Add a small timeout here because it looks like a 
+                // mistake if the view changes instantly 
+                setTimeout(function () {
+                    // Prevent the stream from playing after the 
+                    // timeout error has fired
+                    if (!streamTimedOut) {
+                        isLoading = false; 
+                        LogicHelpers.callMeMaybe(doWhenLoaded); 
+                        UI.mainAudio.play(); 
+                    }
+                }, 1000); 
+			}, false);
+
+			UI.mainAudio.load(); 
 
 			// Return API to allow method chaining
 			return API; 
@@ -191,12 +250,20 @@
 		}
 	});
 
-	start.addEventListener('click', function () {
+	UI.start.addEventListener('click', function () {
+        var startBrushing; 
+        var streamTimedOut; 
 
 		UI.start.innerText = 'Loading...';
 		UI.start.classList.add('disabled'); 
 
-		var startBrushing = function () {
+        window.setTimeout(function () {
+            if (RadioPlayer.streamLoading()) {
+                UI.start.innerText = "Still Loading...";
+            }
+        }, 6000); 
+
+		startBrushing = function () {
 			UI.start.innerText = smallScreen ? 'Start' : 'Start Brushing';
 			UI.start.classList.remove('disabled'); 
 
@@ -205,17 +272,33 @@
 			stopwatch.start(); 
 		};
 
+        streamTimedOut = function () {
+            DOMHelpers.hide(UI.pageIntro); 
+            DOMHelpers.show(UI.timeout);
+        };
+
 		if (UI.audioSelection.value.length > 0) {
-			RadioPlayer.setSource(UI.audioSelection.value).start(startBrushing); 
+            // Start the music 
+			RadioPlayer
+            .setStreamTimeout(15000)
+            .setSource(UI.audioSelection.value)
+            .start(startBrushing, streamTimedOut); 
 		} else {
 			startBrushing(); 
 		}
 
 	});
 
+    UI.restart.addEventListener('click', function () {
+        DOMHelpers.hide(UI.timeout); 
+        UI.start.classList.remove('disabled'); 
+        UI.start.innerText = smallScreen ? 'Start' : 'Start Brushing';
+        DOMHelpers.show(UI.pageIntro); 
+    }, false);
+
 	UI.stopAudio.addEventListener('click', function () { 
 		RadioPlayer.stop(); 
-	});
+	}, false);
 
 	UI.stopBrushing.addEventListener('click', function () {
 		RadioPlayer.stop();  
@@ -237,6 +320,6 @@
 		}; 
 
 		resetMouth(); 
-	});
+	}, false);
 
 })(); 
