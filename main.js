@@ -13,6 +13,7 @@
 	'use strict';
 
 	var UI = {};
+	var smallScreen = window.screen.availWidth < 700; 
 	var RadioPlayer; 
 	var stopwatch;
 	var DOMHelpers; 
@@ -50,6 +51,8 @@
 		UI[UIEl] = DOMHelpers.getEl(UIEl); 
 	});
 
+	UI.start.innerText = smallScreen ? 'Start' : 'Start Brushing';
+
 	RadioPlayer = (function () {
 		var _self = this;
 		var streams; 
@@ -58,7 +61,9 @@
 		streams = {
 			'NPR' : 'http://public.npr.org/anon.npr-mp3/npr/news/newscast.mp3',
 			'HipHop' : 'http://174.37.110.72:8010/;?icy=http',
-			'Top40' : 'http://listen.radionomy.com/101HitsRadio?icy=http'
+			'Top40' : 'http://listen.radionomy.com/101HitsRadio?icy=http',
+			'Electronic' : 'http://37.59.122.23/;?icy=http',
+			'Country' : 'http://206.190.136.212:1243/Live?icy=http'
 		};
 
 		API = {
@@ -160,7 +165,7 @@
 		}
 	}
 
-	var stopwatch = new StopWatch({
+	stopwatch = new StopWatch({
 		maxSeconds: 120, 
 		doOnStop: function (totalSeconds) {
 			UI.mouthQuadrant.innerHTML = "You're done!";  
@@ -192,7 +197,7 @@
 		UI.start.classList.add('disabled'); 
 
 		var startBrushing = function () {
-			UI.start.innerText = 'Start Brushing';
+			UI.start.innerText = smallScreen ? 'Start' : 'Start Brushing';
 			UI.start.classList.remove('disabled'); 
 
 			DOMHelpers.hide(UI.pageIntro); 
