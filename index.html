@@ -1,0 +1,52 @@
+<!doctype HTML>
+<html>
+<head>
+	<title> Tooth Party </title>
+	<meta name="viewport" content="width=device-width, user-scalable=no">
+	<link rel="stylesheet" href="main.css" type="text/css"/>
+</head>
+<body>
+
+	<audio id="mainAudio">
+		<source id="mainSource" type="audio/mpeg">
+	</audio>
+
+	<main>
+		<section class="page" id="pageIntro">
+			<h1><span>Tooth</span><span>Fiesta</span></h1>
+
+			<p id="about">Dentists recommend you brush each part of your mouth 
+			for at least 30 seconds. Let's make it fun.</p>
+
+			<div id="selectWrapper">
+			<select name="audio" id="audioSelection">
+				<option value="HipHop">Dirty South Rap</option>
+				<option value="NPR">NPR - Breaking News</option>
+				<option value="Top40" selected>Billboard Top 40</option>
+			</select>
+			</div>
+
+			<a id="start" class="ui-control">Start Brushing</a>
+		</section>
+
+		<section class="page hidden" id="pageBrushing">
+			<aside id="mouthWrapper">
+				<div class="mouth-upper-left" id="mouth"></div>
+			</aside>
+
+			<section id="overview">
+				<div id="mouthQuadrant" class="important">Brush your <b>upper-left</b> mouth</div>
+				<div id="progress">120 seconds left</div>
+				<progress max="100" value="100" id="progressBar"></progress>
+				<a id="stopAudio" class="ui-control">Stop Radio</a>
+				<a id="stopBrushing" class="ui-control">Go Back</a>
+			</section>
+		</section>
+
+		<footer>By <a href="http://www.codyromano.com">Cody Romano</a> &nbsp; &copy;2014</footer>
+	</main>
+
+<script src="main.js"></script>
+
+</body>
+</html> 
