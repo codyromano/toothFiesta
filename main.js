@@ -283,7 +283,7 @@
 			var message = 'Brush your <b>partOfMouth</b> mouth'; 
 
 			// Update the time display 
-			UI.progress.innerText = (120 - seconds) + ' seconds left';
+			UI.progress.innerHTML = (120 - seconds) + ' seconds left';
 			UI.progressBar.value = 100 -  ((seconds / 120) * 100).toFixed(0);
 
 			// Change brushing instructions graphic and text 
@@ -334,7 +334,7 @@
 
         radioToggle.switchOn(); 
 
-		UI.start.innerText = 'Loading...';
+		UI.start.innerHTML = 'Loading...';
 		UI.start.classList.add('disabled'); 
 
         window.setTimeout(function () {
@@ -344,7 +344,7 @@
         }, 6000); 
 
 		startBrushing = function () {
-			UI.start.innerText = smallScreen ? 'Start' : 'Start Brushing';
+			UI.start.innerHTML = smallScreen ? 'Start' : 'Start Brushing';
 			UI.start.classList.remove('disabled'); 
 
 			DOMHelpers.hide(UI.pageIntro); 
