@@ -77,7 +77,7 @@
 		UI[UIEl] = DOMHelpers.getEl(UIEl); 
 	});
 
-	UI.start.innerText = smallScreen ? 'Start' : 'Start Brushing';
+	UI.start.innerHTML = smallScreen ? 'Start' : 'Start Brushing';
 
     /** 
     * This can be used for any UI element that has 
@@ -320,11 +320,11 @@
 
         callbackForOff: function (el) {
             RadioPlayer.pause(); 
-            el.innerText = 'Play Radio'; 
+            el.innerHTML = 'Play Radio'; 
         }, 
         callbackForOn: function (el) {
             RadioPlayer.resume(); 
-            el.innerText = 'Mute Radio'; 
+            el.innerHTML = 'Mute Radio'; 
         }
     });
 
@@ -339,7 +339,7 @@
 
         window.setTimeout(function () {
             if (RadioPlayer.streamLoading()) {
-                UI.start.innerText = "Still Loading...";
+                UI.start.innerHTML = "Still Loading...";
             }
         }, 6000); 
 
@@ -372,7 +372,7 @@
     UI.restart.addEventListener('click', function () {
         DOMHelpers.hide(UI.timeout); 
         UI.start.classList.remove('disabled'); 
-        UI.start.innerText = smallScreen ? 'Start' : 'Start Brushing';
+        UI.start.innerHTML = smallScreen ? 'Start' : 'Start Brushing';
         DOMHelpers.show(UI.pageIntro); 
     }, false);
 
