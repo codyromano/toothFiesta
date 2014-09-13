@@ -24,6 +24,7 @@
 
     // Controls everything related to audio
     var RadioPlayer;
+    var radioToggle;
 
     // Used for making minor design changes
 	var smallScreen = window.screen.availWidth < 700; 
@@ -31,8 +32,6 @@
     // Instance of the StopWatch "class," which handles all 
     // time-related functionality  
 	var stopwatch;
-
-    var radioToggle;
  
     // A shortcut for handling optional callbacks; 
     // only call a function if it exists
@@ -275,44 +274,38 @@
 		};
 	}
 
-
-	function getMouthQuadrant (secondsBrushing) {
-		if (secondsBrushing <= 30) {
-			return 'upper-left';
-		}
-		if (secondsBrushing > 30 && secondsBrushing <= 60) {
-			return 'upper-right'; 
-		}
-		if (secondsBrushing > 60 && secondsBrushing <= 90) {
-			return 'bottom-left'; 
-		}
-		if (secondsBrushing > 90 && secondsBrushing <= 120) {
-			return 'bottom-right'; 
-		}
-	}
-
 	stopwatch = new StopWatch({
 		maxSeconds: 120, 
 		doOnStop: function (totalSeconds) {
 			UI.mouthQuadrant.innerHTML = "You're done!";  
 		},
 		doOnEachIteration: function (seconds) {
-			UI.mouthQuadrant.innerHTML = 'Brush your <b>' + 
-			getMouthQuadrant(seconds) + '</b> mouth.'; 
+			var message = 'Brush your <b>partOfMouth</b> mouth'; 
+
+			// Update the time display 
 			UI.progress.innerText = (120 - seconds) + ' seconds left';
 			UI.progressBar.value = 100 -  ((seconds / 120) * 100).toFixed(0);
 
-			if (seconds == 30) {
-				UI.mouth.classList.add('mouth-upper-right'); 
-				UI.mouth.classList.remove('mouth-upper-left'); 
-			}
-			if (seconds == 60) {
-				UI.mouth.classList.add('mouth-bottom-left'); 
-				UI.mouth.classList.remove('mouth-upper-right'); 
-			}
-			if (seconds == 90) {
-				UI.mouth.classList.add('mouth-bottom-right'); 
-				UI.mouth.classList.remove('mouth-bottom-left'); 
+			// Change brushing instructions graphic and text 
+			switch (seconds) {
+				case 30: 
+					UI.mouthQuadrant.innerHTML = message.replace('partOfMouth',
+					'upper-right'); 
+					UI.mouth.classList.add('mouth-upper-right'); 
+					UI.mouth.classList.remove('mouth-upper-left'); 
+				break;
+				case 60: 
+					UI.mouthQuadrant.innerHTML = message.replace('partOfMouth',
+					'bottom-left'); 
+					UI.mouth.classList.add('mouth-bottom-left'); 
+					UI.mouth.classList.remove('mouth-upper-right'); 
+				break;
+				case 90: 
+					UI.mouthQuadrant.innerHTML = message.replace('partOfMouth',
+						'bottom-right'); 
+					UI.mouth.classList.add('mouth-bottom-right'); 
+					UI.mouth.classList.remove('mouth-bottom-left'); 
+				break;
 			}
 		}
 	});
