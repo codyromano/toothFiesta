@@ -79,6 +79,18 @@
 
 	UI.start.innerHTML = smallScreen ? 'Start' : 'Start Brushing';
 
+
+	function trackGoogleAnalyticsView (viewKeyword) {
+		window.location = '#' + viewKeyword; 
+
+		var trackPage = location.pathname + location.search + location.hash;
+
+		if (typeof _gaq == 'object' && 'push' in _gaq) {
+			_gaq.push(['_trackPageview', trackPage]);
+			console.log('tracked ', trackPage); 
+		}
+	}
+
     /** 
     * This can be used for any UI element that has 
     * an on and off state. Customize with on/off callbacks
@@ -277,6 +289,7 @@
 	stopwatch = new StopWatch({
 		maxSeconds: 120, 
 		doOnStop: function (totalSeconds) {
+			trackGoogleAnalyticsView('doneBrushing'); 
 			UI.mouthQuadrant.innerHTML = "You're done!";  
 		},
 		doOnEachIteration: function (seconds) {
@@ -329,6 +342,8 @@
     });
 
 	UI.start.addEventListener('click', function () {
+		trackGoogleAnalyticsView('loading'); 
+
         var startBrushing; 
         var streamTimedOut; 
 
@@ -339,11 +354,13 @@
 
         window.setTimeout(function () {
             if (RadioPlayer.streamLoading()) {
+            	trackGoogleAnalyticsView('slowLoad'); 
                 UI.start.innerHTML = "Still Loading...";
             }
         }, 6000); 
 
 		startBrushing = function () {
+			trackGoogleAnalyticsView('brushing');  
 			UI.start.innerHTML = smallScreen ? 'Start' : 'Start Brushing';
 			UI.start.classList.remove('disabled'); 
 
@@ -355,6 +372,7 @@
         streamTimedOut = function () {
             DOMHelpers.hide(UI.pageIntro); 
             DOMHelpers.show(UI.timeout);
+            trackGoogleAnalyticsView('timeout'); 
         };
 
 		if (UI.audioSelection.value.length > 0) {
