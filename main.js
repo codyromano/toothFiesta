@@ -52,8 +52,17 @@
 		},
 		show: function (element) {
 			element.style.display = 'block';
+		},
+		preloadMainBackground: function () {
+			var img = new Image;
+			img.onload = function () {
+				document.body.classList.add('mainBackgroundImage'); 
+			};
+			img.src = 'bg.jpg'; 
 		}
 	};
+
+	DOMHelpers.preloadMainBackground(); 
 
 	// Build the UI 
 	UIElements = [
@@ -79,7 +88,7 @@
 
 	UI.start.innerHTML = smallScreen ? 'Start' : 'Start Brushing';
 
-
+	
 	function trackGoogleAnalyticsView (viewKeyword) {
 		window.location = '#' + viewKeyword; 
 
