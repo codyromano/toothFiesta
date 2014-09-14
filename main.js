@@ -96,7 +96,6 @@
 
 		if (typeof _gaq == 'object' && 'push' in _gaq) {
 			_gaq.push(['_trackPageview', trackPage]);
-			console.log('tracked ', trackPage); 
 		}
 	}
 
@@ -299,7 +298,10 @@
 		maxSeconds: 120, 
 		doOnStop: function (totalSeconds) {
 			trackGoogleAnalyticsView('doneBrushing'); 
-			UI.mouthQuadrant.innerHTML = "You're done!";  
+
+			if (totalSeconds >= 120) {
+				UI.mouthQuadrant.innerHTML = "You're done!";  
+			}
 		},
 		doOnEachIteration: function (seconds) {
 			var message = 'Brush your <b>partOfMouth</b> mouth'; 
@@ -310,6 +312,10 @@
 
 			// Change brushing instructions graphic and text 
 			switch (seconds) {
+				case 1: 
+					UI.mouthQuadrant.innerHTML = message.replace('partOfMouth',
+						'upper-left'); 
+				break;
 				case 30: 
 					UI.mouthQuadrant.innerHTML = message.replace('partOfMouth',
 					'upper-right'); 
