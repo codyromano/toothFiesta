@@ -12,6 +12,40 @@
 (function () {
 	'use strict';
 
+	/** 
+	* @todo Need to organize the views and UI elements...
+	* want to write a simple MVC framework. Using one like 
+	* Angular or Backbone would be excessive in this case.
+	*/
+
+	var EventDispatcher = (function () {
+		var listeners = {}; 
+		var publicAPI = {
+			listen: listen, 
+			broadcast: broadcast
+		};
+
+		function listen (eventName, callback) {
+			if (!listeners[eventName]) {
+				listeners[eventName] = []; 
+			}
+			listeners[eventName].push(callback); 
+		}
+
+		function broadcast (eventName, params) {
+			var params = params || {}; 
+			if (listeners[eventName]) {
+				listeners[eventName].forEach(function (callback) {
+					if (typeof callback == 'function') {
+						callback.call(callback, params);
+					} 
+				});
+			}
+		}
+
+		return publicAPI; 
+	})(); 
+
     // Contains a reference to every UI element in the DOM. 
 	var UI = {};
     var UIElements; 
@@ -152,7 +186,7 @@
 
 	RadioPlayer = (function () {
 		var _self = this;
-		var streams; 
+		var defaultStream = 'Top40'; 
 		var API; 
 
 		// When we should give up on starting a stream
@@ -160,7 +194,7 @@
 
         var isLoading = false; 
 
-		streams = {
+		var streams = {
             'BobMarley' : 'http://streaming.radionomy.com/Bob-Marley',
 			'NPR' : 'http://public.npr.org/anon.npr-mp3/npr/news/newscast.mp3',
 			'HipHop' : 'http://174.37.110.72:8010/;?icy=http',
@@ -169,10 +203,11 @@
 			'Country' : 'http://206.190.136.212:1243/Live?icy=http'
 		};
 
+		var currentStream = streams[defaultStream];
+
 		API = {
 			start: start, 
 			stop: stop, 
-			setSource: setSource,
             setStreamTimeout: setStreamTimeout,
             streamLoading: streamLoading,
             resume: resume,
@@ -244,10 +279,11 @@
             return API; 
         }
 
-		function setSource (keyword) {
-			UI.mainSource.src = streams[keyword]; 
-			return API; 
-		};
+		EventDispatcher.listen('streamChanged', function (params) {
+			console.log(params);
+			currentStream = streams[params.currentStream];
+			UI.mainSource.src = currentStream;
+		});
 
 		return API; 
 	})(); 
@@ -356,6 +392,10 @@
         }
     });
 
+    UI.audioSelection.addEventListener('change', function () {
+    	EventDispatcher.broadcast('streamChanged', {currentStream: this.value});
+    });
+
 	UI.start.addEventListener('click', function () {
 		trackGoogleAnalyticsView('loading'); 
 
@@ -391,10 +431,13 @@
         };
 
 		if (UI.audioSelection.value.length > 0) {
+
+			EventDispatcher.broadcast('streamChanged', 
+				{currentStream: UI.audioSelection.value});
+
             // Start the music 
 			RadioPlayer
             .setStreamTimeout(15000)
-            .setSource(UI.audioSelection.value)
             .start(startBrushing, streamTimedOut); 
 		} else {
 			startBrushing(); 
