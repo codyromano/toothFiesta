@@ -12,6 +12,14 @@
 (function () {
 	'use strict';
 
+	function playDing() {
+		var audio = document.createElement('audio');
+		audio.src = 'audio/ding.mp3';
+		audio.play();
+	}
+
+	//setInterval(playDing, 3000);
+
 	/** 
 	* @todo Need to organize the views and UI elements...
 	* want to write a simple MVC framework. Using one like 
@@ -353,18 +361,21 @@
 						'upper-left'); 
 				break;
 				case 30: 
+					playDing();
 					UI.mouthQuadrant.innerHTML = message.replace('partOfMouth',
 					'upper-right'); 
 					UI.mouth.classList.add('mouth-upper-right'); 
 					UI.mouth.classList.remove('mouth-upper-left'); 
 				break;
 				case 60: 
+					playDing();
 					UI.mouthQuadrant.innerHTML = message.replace('partOfMouth',
 					'bottom-left'); 
 					UI.mouth.classList.add('mouth-bottom-left'); 
 					UI.mouth.classList.remove('mouth-upper-right'); 
 				break;
-				case 90: 
+				case 90:
+					playDing();
 					UI.mouthQuadrant.innerHTML = message.replace('partOfMouth',
 						'bottom-right'); 
 					UI.mouth.classList.add('mouth-bottom-right'); 
